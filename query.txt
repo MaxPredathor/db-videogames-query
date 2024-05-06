@@ -1,0 +1,137 @@
+
+### Query su singola tabella
+
+SELECT *
+FROM software_houses
+WHERE country = 'United States';
+
+SELECT * 
+FROM players
+WHERE city = 'Rogahnland';
+
+SELECT *
+FROM players
+WHERE name LIKE '%a';
+
+SELECT *
+FROM reviews
+WHERE player_id = 800;
+
+SELECT COUNT(*)
+FROM tournaments
+where year = 2015;
+
+SELECT *
+FROM awards
+WHERE description LIKE '%facere%';
+
+SELECT DISTINCT videogame_id
+FROM category_videogame
+WHERE category_id IN (2, 6);
+
+SELECT *
+FROM reviews
+WHERE rating BETWEEN 2 AND 4;
+
+SELECT *
+FROM videogames
+WHERE YEAR(release_date) = 2020;
+
+SELECT DISTINCT videogame_id
+FROM reviews
+WHERE rating = 5;
+
+*********** BONUS ***********
+
+SELECT COUNT(*) AS Numero_Recensioni, AVG(rating) AS Media_Valutazione
+FROM reviews
+WHERE videogame_id = 412;
+
+SELECT COUNT(*) AS Numero_Videogiochi
+FROM videogames
+WHERE software_house_id = 1 AND YEAR(release_date) = 2018;
+
+### Query con group by
+
+SELECT country, COUNT(*) AS Numero_SoftwareHouse
+FROM software_houses
+GROUP BY country;
+
+SELECT videogame_id, COUNT(*) AS Numero_Recensioni
+FROM reviews
+GROUP BY videogame_id;
+
+
+SELECT pegi_label_id, COUNT(*) AS Numero_Videogiochi
+FROM pegi_label_videogame
+GROUP BY pegi_label_id;
+
+SELECT *
+FROM pegi_label_videogame
+
+SELECT YEAR(release_date) AS Anno_Rilascio, COUNT(*) AS Numero_Videogiochi
+FROM videogames
+GROUP BY YEAR(release_date);
+
+SELECT device_id, COUNT(*)
+FROM device_videogame
+GROUP BY device_id;
+
+SELECT videogame_id, AVG(rating) AS Media_Recensioni
+FROM reviews
+GROUP BY videogame_id
+ORDER BY Media_Recensioni DESC;
+
+### Query con join
+
+SELECT DISTINCT players.*
+FROM players
+JOIN reviews ON players.id = reviews.player_id;
+
+SELECT DISTINCT videogames.name
+FROM tournaments
+JOIN tournament_videogame ON tournaments.id = tournament_videogame.tournament_id
+JOIN videogames ON tournament_videogame.videogame_id = videogames.id
+WHERE tournaments.year = 2016;
+
+SELECT category_videogame.videogame_id, category_videogame.category_id
+FROM category_videogame
+JOIN videogames ON category_videogame.videogame_id = videogames.id;
+
+SELECT DISTINCT software_houses.*
+FROM software_houses
+JOIN videogames ON software_houses.id = videogames.software_house_id
+WHERE YEAR(videogames.release_date) > 2020;
+
+SELECT software_houses.id, award_videogame.*
+FROM software_houses
+JOIN videogames ON software_houses.id = videogames.software_house_id
+JOIN award_videogame ON videogames.id = award_videogame.videogame_id;
+
+SELECT DISTINCT categories.name, pegi_labels.name, videogames.name
+FROM videogames
+JOIN reviews on videogames.id = reviews.videogame_id
+JOIN category_videogame on videogames.id = category_videogame.videogame_id
+JOIN categories on category_videogame.category_id = categories.id
+JOIN pegi_label_videogame on videogames.id = pegi_label_videogame.videogame_id
+JOIN pegi_labels on pegi_label_videogame.pegi_label_id = pegi_labels.id
+WHERE reviews.rating IN (4, 5);
+
+SELECT tournaments.city, videogames.name
+FROM videogames
+JOIN award_videogame ON videogames.id = award_videogame.videogame_id
+JOIN awards ON awards.id = award_videogame.award_id
+JOIN tournament_videogame ON tournament_videogame.videogame_id = videogames.id
+JOIN tournaments ON tournaments.id = tournament_videogame.tournament_id
+WHERE awards.name LIKE 'gioco dell''anno' AND award_videogame.year = 2018;
+
+SELECT players.id, players.name
+FROM awards
+JOIN award_videogame ON award_videogame.award_id = awards.id
+JOIN videogames ON videogames.id = award_videogame.videogame_id
+JOIN tournament_videogame ON tournament_videogame.videogame_id = videogames.id
+JOIN tournaments ON tournaments.id = tournament_videogame.tournament_id
+JOIN player_tournament ON player_tournament.tournament_id = tournaments.id
+JOIN players ON players.id = player_tournament.player_id
+WHERE awards.name like 'gioco più atteso' AND award_videogame.year = 2018 
+and tournaments.year = 2019;
